@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.mqtttestingtool.MainViewModel" />
+    </data>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/btnUnsub"
+        android:layout_width="105dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="104dp"
+        android:text="unsub"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.52"
+        app:layout_constraintStart_toEndOf="@+id/btnSub"
+        app:layout_constraintTop_toBottomOf="@+id/txtMsg" />
+
+    <Button
+        android:id="@+id/btnConn"
+        android:layout_width="105dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="104dp"
+        android:text="connect2broker"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtMsg" />
+
+    <Button
+        android:id="@+id/btnPub"
+        android:layout_width="105dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="153dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="153dp"
+        android:text="publish"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSub" />
+
+    <Button
+        android:id="@+id/btnSub"
+        android:layout_width="105dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="104dp"
+        android:text="sub"
+        app:layout_constraintStart_toEndOf="@+id/btnConn"
+        app:layout_constraintTop_toBottomOf="@+id/txtMsg" />
+
+    <EditText
+        android:id="@+id/txtPort"
+        android:layout_width="112dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="16dp"
+        android:ems="10"
+        android:hint="port"
+        android:text="@={viewModel.port}"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/txtIP"
+        android:layout_width="135dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        android:hint="IP"
+        android:text="@={viewModel.ip}"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toStartOf="@+id/txtPort"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/txtTopic"
+        android:layout_width="201dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:hint="topic"
+        android:text="@={viewModel.topic}"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtIP" />
+
+    <EditText
+        android:id="@+id/txtMsg"
+        android:layout_width="201dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:hint="msg"
+        android:text="@={viewModel.msg}"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtTopic" />
+
+    <TextView
+        android:id="@+id/txtResult"
+        android:layout_width="373dp"
+        android:layout_height="375dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
+        android:gravity="top|left"
+        android:hint="result"
+        android:text="@={viewModel.result}"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnPub" />
+
+    <ToggleButton
+        android:id="@+id/togRetain"
+        android:layout_width="105dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="61dp"
+        android:layout_marginTop="28dp"
+        android:text="retain"
+        android:checked="@={viewModel.retain}"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtMsg" />
+
+    <EditText
+        android:id="@+id/txtQos"
+        android:layout_width="150dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:hint="Qos"
+        android:inputType="number"
+        android:text="@={viewModel.qos}"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintStart_toEndOf="@+id/togRetain"
+        app:layout_constraintTop_toBottomOf="@+id/txtMsg" />
+
+    <EditText
+        android:id="@+id/txtProtocol"
+        android:layout_width="112dp"
+        android:layout_height="41dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:hint="protocol"
+        android:text="@={viewModel.ptc}"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toStartOf="@+id/txtIP"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>
