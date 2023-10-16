@@ -1,14 +1,17 @@
 package com.example.mqtttestingtool
 
+import android.app.Application
 import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 
 //第一個字要大寫 不然會出現錯誤: Execution failed for task ':app:dataBindingGenBaseClassesDebug'. > couldn't make a guess for com.example.mqtttestingtool.viewModel
-class MainViewModel():ViewModel() {
+class MainViewModel(): ViewModel() {
     lateinit var mqttAndroidClient: MqttAndroidClient
+
 
     val ptc: MutableLiveData<String> by lazy { MutableLiveData<String>() }
     val ip: MutableLiveData<String> by lazy { MutableLiveData<String>() }
