@@ -1,13 +1,14 @@
 package com.example.mqtttestingtool
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 
 //第一個字要大寫 不然會出現錯誤: Execution failed for task ':app:dataBindingGenBaseClassesDebug'. > couldn't make a guess for com.example.mqtttestingtool.viewModel
-class MainViewModel:ViewModel() {
-    //lateinit var mqttAndroidClient: MqttAndroidClient
+class MainViewModel():ViewModel() {
+    lateinit var mqttAndroidClient: MqttAndroidClient
 
     val ptc: MutableLiveData<String> by lazy { MutableLiveData<String>() }
     val ip: MutableLiveData<String> by lazy { MutableLiveData<String>() }
@@ -16,11 +17,13 @@ class MainViewModel:ViewModel() {
     val msg: MutableLiveData<String> by lazy { MutableLiveData<String>() }
     val qos: MutableLiveData<String> by lazy { MutableLiveData<String>() }
     val result: MutableLiveData<String> by lazy { MutableLiveData<String>() }
-    val retain: MutableLiveData<Boolean> by lazy { MutableLiveData<Boolean>() }
+    //預設沒按toggleButton為false
+    val retain: MutableLiveData<Boolean> by lazy { MutableLiveData<Boolean>(false) }
 
 
 
-//    fun sub(){
+//    fun subscribe(){
+//
 //        mqttAndroidClient.subscribe(topic.value, Integer.parseInt(qos.value!!),null, object : IMqttActionListener{
 //            override fun onSuccess(asyncActionToken: IMqttToken?) {
 //                println("${topic.value}訂閱成功")

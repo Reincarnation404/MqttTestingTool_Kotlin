@@ -132,7 +132,9 @@
         android:layout_height="55dp"
         android:layout_marginStart="61dp"
         android:layout_marginTop="28dp"
-        android:text="retain"
+        android:textOn="retain"
+        android:textOff="no retain"
+
         android:checked="@={viewModel.retain}"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtMsg" />
