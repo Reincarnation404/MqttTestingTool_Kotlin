@@ -5,9 +5,11 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.mqtttestingtool.databinding.ActivityMainBinding
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -18,26 +20,24 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding= ActivityMainBinding.inflate(layoutInflater)
-        binding.viewModel = MainViewModel()
+        val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
         setContentView(binding.root)
 
         with(binding){
             //初始化MqttAndroidClient
-
-            //mqttAndroidClient = MqttAndroidClient(this@MainActivity, uri, clientId)
-            val uri = "${viewModel?.ptc?.value}://${viewModel?.ip?.value}:${viewModel?.port?.value}"
+            val uri = "${viewModel.ptc.value}://${viewModel.ip.value}:${viewModel.port.value}"
             val clientId = MqttClient.generateClientId()
-            mqttHelper = mqttHelper(this@MainActivity,uri,clientId)
-
+            mqttAndroidClient = MqttAndroidClient(this@MainActivity, uri, clientId)
+            //startMqtt(this@MainActivity,uri,clientId)
 
             btnConn.setOnClickListener {
-                val uri2 = "${viewModel?.ptc?.value}://${viewModel?.ip?.value}:${viewModel?.port?.value}"
-                mqttHelper.connect(this@MainActivity, uri2, clientId)
+                connect()
             }
 
             btnSub.setOnClickListener {
-                val connected = mqttHelper.isConnected()
+                val connected = mqttAndroidClient.isConnected
                 if (connected){
                     val topic = viewModel?.topic?.value?.trim()
                     val qos = viewModel?.qos?.value?.trim()
@@ -49,8 +49,7 @@ class MainActivity : AppCompatActivity() {
                     }else if (Integer.parseInt(qos)<0 || Integer.parseInt(qos)>2){
                         txtQos.error = "qos只能0~2"
                     }else{
-                        mqttHelper.sub(topic,qos)
-                        //Toast.makeText(this@MainActivity,"$topic 訂閱成功", Toast.LENGTH_LONG).show()
+                        sub()
                     }
                 }else{
                     Toast.makeText(this@MainActivity,"尚未連線or連線出錯", Toast.LENGTH_LONG).show()
@@ -59,13 +58,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             btnUnsub.setOnClickListener {
-                val connected = mqttHelper.isConnected()
+                val connected = mqttAndroidClient.isConnected
                 val topic = viewModel?.topic?.value?.trim()
                 if (connected){
                     if (topic.isNullOrEmpty()){
                         txtTopic.error = "Topic不可為空"
                     }else{
-                        mqttHelper.unsub(topic)
+                        unsub()
                     }
                 }else{
                     Toast.makeText(this@MainActivity,"尚未連線or連線有問題", Toast.LENGTH_LONG).show()
@@ -73,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             btnPub.setOnClickListener {
-                val connected = mqttHelper.isConnected()
+                val connected = mqttAndroidClient.isConnected
                 if (connected){
                     val topic = viewModel?.topic?.value?.trim()
                     val qos = viewModel?.qos?.value?.trim()
@@ -90,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                         txtMsg.error = "請輸入msg"
                         return@setOnClickListener
                     }else{
-                        mqttHelper.pub(topic, qos, msg, retain)
+                        pub()
 
                     }
                 }else{
@@ -100,11 +99,10 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            showMessage()
-
         }
 
     }
+
 
 
     private fun connect(){
@@ -146,61 +144,82 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-//    private fun sub(){
-//        with(binding.viewModel){
-//            mqttAndroidClient.subscribe(this?.topic?.value, Integer.parseInt(this?.qos?.value!!),null, object : IMqttActionListener{
-//                override fun onSuccess(asyncActionToken: IMqttToken?) {
-//                    println("${this@with.topic.value}訂閱成功")
-//                }
-//
-//                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-//                    println("${this@with.topic.value}訂閱失敗")
-//                }
-//            })
-//        }
-//
-//    }
-
-//    private fun unsub(){
-//        with(binding.viewModel){
-//            mqttAndroidClient.unsubscribe(this?.topic?.value, null, object : IMqttActionListener{
-//                override fun onSuccess(asyncActionToken: IMqttToken?) {
-//                    println("${this@with?.topic?.value}取消訂閱成功")
-//                }
-//
-//                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-//                    println("${this@with?.topic?.value}取消訂閱失敗")
-//                }
-//
-//            })
-//        }
-//    }
-
-//    private fun pub(){
-//        with(binding.viewModel){
-//            val m = MqttMessage()
-//            m.payload = this?.msg?.value?.toByteArray()
-//            m.qos = Integer.parseInt(this?.qos?.value!!)
-//            m.isRetained = this.retain.value!!
-//            mqttAndroidClient.publish(this.topic.value, m, null, object :IMqttActionListener{
-//                override fun onSuccess(asyncActionToken: IMqttToken?) {
-//                    println("${this@with?.topic?.value}發布成功")
-//                }
-//
-//                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-//                    println("${this@with?.topic?.value}發布失敗")
-//                }
-//
-//            })
-//        }
-//    }
-
-    private fun showMessage(){
+    private fun sub(){
         with(binding.viewModel){
-            this?.result?.value = mqttHelper.receivedMsg()
+            mqttAndroidClient.subscribe(this?.topic?.value, Integer.parseInt(this?.qos?.value!!),null, object : IMqttActionListener{
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                    println("${this@with.topic.value}訂閱成功")
+                    Toast.makeText(this@MainActivity,"${this@with?.topic?.value} 訂閱成功", Toast.LENGTH_LONG).show()
+                }
+
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                    println("${this@with.topic.value}訂閱失敗")
+                    Toast.makeText(this@MainActivity,"${this@with?.topic?.value} 訂閱失敗", Toast.LENGTH_LONG).show()
+                }
+            })
         }
 
     }
+
+    private fun unsub(){
+        with(binding.viewModel){
+            mqttAndroidClient.unsubscribe(this?.topic?.value, null, object : IMqttActionListener{
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                    println("${this@with?.topic?.value}取消訂閱成功")
+                    Toast.makeText(this@MainActivity,"${this@with?.topic?.value} 取消訂閱成功", Toast.LENGTH_LONG).show()
+                }
+
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                    println("${this@with?.topic?.value}取消訂閱失敗")
+                    Toast.makeText(this@MainActivity,"${this@with?.topic?.value} 取消訂閱失敗", Toast.LENGTH_LONG).show()
+                }
+
+            })
+        }
+    }
+
+    private fun pub(){
+        with(binding.viewModel){
+            val m = MqttMessage()
+            m.payload = this?.msg?.value?.toByteArray()
+            m.qos = Integer.parseInt(this?.qos?.value!!)
+            m.isRetained = this.retain.value!!
+            mqttAndroidClient.publish(this.topic.value, m, null, object :IMqttActionListener{
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                    println("${this@with?.topic?.value}發布成功")
+                    Toast.makeText(this@MainActivity,"${this@with?.topic?.value} 發布成功", Toast.LENGTH_LONG).show()
+                }
+
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                    println("${this@with?.topic?.value}發布失敗")
+                    Toast.makeText(this@MainActivity,"${this@with?.topic?.value} 發布失敗", Toast.LENGTH_LONG).show()
+                }
+
+            })
+        }
+    }
+
+    fun startMqtt(context: Context, uri:String, id:String){
+        with(binding.viewModel){
+            mqttAndroidClient = MqttAndroidClient(context, uri, id)
+            mqttHelper = mqttHelper(mqttAndroidClient)
+            mqttHelper.setCallBack(object : MqttCallback{
+                override fun connectionLost(cause: Throwable?) {
+                }
+
+                override fun messageArrived(topic: String?, message: MqttMessage?) {
+                    this@with?.result?.value = message.toString()
+                    println("messageArrived= $message from topic= $topic")
+                }
+
+                override fun deliveryComplete(token: IMqttDeliveryToken?) {
+                }
+
+            })
+
+        }
+    }
+
 
 
 }

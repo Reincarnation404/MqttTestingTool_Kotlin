@@ -5,15 +5,28 @@ import android.widget.Toast
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 
-class mqttHelper(context: Context,uri: String?,id: String) {
-    var mqttAndroidClient : MqttAndroidClient
+class mqttHelper(var mqttAndroidClient: MqttAndroidClient) {
+    var m:String = ""
 
-    init {
-        mqttAndroidClient = MqttAndroidClient(context,uri,id)
-    }
 
-    fun connect(context: Context, uri: String?, id: String){
-        mqttAndroidClient = MqttAndroidClient(context, uri, id)
+
+
+
+    fun connect(context: Context, uri:String){
+        //mqttAndroidClient = MqttAndroidClient(context, uri, id)
+//        mqttAndroidClient.setCallback(object : MqttCallback{
+//            override fun connectionLost(cause: Throwable?) {
+//            }
+//
+//            override fun messageArrived(topic: String?, message: MqttMessage?) {
+//                println("$topic 的msg: ${message.toString()}")
+//                m = message.toString()
+//            }
+//
+//            override fun deliveryComplete(token: IMqttDeliveryToken?) {
+//            }
+//
+//        })
         val mqttConnectOptions = MqttConnectOptions()
         mqttConnectOptions.isCleanSession = false
         mqttAndroidClient.connect(mqttConnectOptions, object : IMqttActionListener{
@@ -75,22 +88,8 @@ class mqttHelper(context: Context,uri: String?,id: String) {
         return mqttAndroidClient.isConnected
     }
 
-    fun receivedMsg():String {
-        var m = ""
-        mqttAndroidClient.setCallback(object : MqttCallback{
-            override fun connectionLost(cause: Throwable?) {
-            }
-
-            override fun messageArrived(topic: String?, message: MqttMessage?) {
-                println("messageArrived= $message from topic= $topic")
-                m= message.toString()
-            }
-
-            override fun deliveryComplete(token: IMqttDeliveryToken?) {
-            }
-
-        })
-        return m
+    fun setCallBack(mqttCallback: MqttCallback) {
+        mqttAndroidClient.setCallback(mqttCallback)
     }
 
 
